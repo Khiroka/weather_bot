@@ -1,5 +1,5 @@
 # coding: utf-8
-
+from slack import WebClient
 from slackbot.bot import respond_to     # @botname: で反応するデコーダ
 from slackbot.bot import listen_to      # チャネル内発言で反応するデコーダ
 from slackbot.bot import default_reply  # 該当する応答がない場合に反応するデコーダ
@@ -14,39 +14,121 @@ import pprint
 import re
 import datetime
 
+client = WebClient(token=os.getenv('SLACK_CLIENT_TOKEN'))
 API_KEY = "e2b220b4263af8d026cb5e44abd8f568" # xxxに自分のAPI_Keyを入力。
 
 
-@listen_to('(.*)')
+@listen_to('^天気')
 def reply_weather(message, arg):
 
-    if re.search('^天気', arg) is None:
-        return
+    client.chat_postMessage(
+    channel=message.body['channel'],
+  
+    blocks=[
+            {
+                "type": "divider"
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "天気を知りたい都道府県を教えて欲しいなッ！！！"
+                },
+                "accessory": {
+                    "type": "static_select",
+                    "action_id": "select-menu",
+                    "placeholder": {
+                        "type": "plain_text",
+                        "text": "ここから選んでね！！",
+                    },
+                    "options": [
+                        {
+                            "text": {
+                                "type": "plain_text",
+                                "text": "東京",
+                            },
+                            "value": "value-0"
+                        },
+                        {
+                            "text": {
+                                "type": "plain_text",
+                                "text": "埼玉",
+                            },
+                            "value": "value-1"
+                        },
+                        {
+                            "text": {
+                                "type": "plain_text",
+                                "text": "千葉",
+                            },
+                            "value": "value-2"
+                        },
+                        {
+                            "text": {
+                                "type": "plain_text",
+                                "text": "山梨",
+                            },
+                            "value": "value-3"
+                        },
+                        {
+                            "text": {
+                                "type": "plain_text",
+                                "text": "グンマ",
+                            },
+                            "value": "value-4"
+                        },
+                        {
+                            "text": {
+                                "type": "plain_text",
+                                "text": "茨城",
+                            },
+                            "value": "value-5"
+                        },
+                        {
+                            "text": {
+                                "type": "plain_text",
+                                "text": "栃木",
+                            },
+                            "value": "value-6"
+                        }
+                    ]
+                }
+            },
+            {
+                "type": "divider"
+            }
+    ]
+)
 
-    if "千葉" in arg:
+    # if re.search('^天気', arg) is None:
+    #     return
+
+    if "千葉" in "select-menu":
         city_name = "Chiba"
         city = "千葉"
-    elif "埼玉" in arg:
+    elif "埼玉" in "select-menu":
         city_name = "Saitama"
         city = "埼玉"
-    elif "茨城" in arg:
+    elif "茨城" in "select-menu":
         city_name = "Ibaraki"
         city = "茨城"
-    elif "群馬" in arg:
+    elif "群馬" in "select-menu":
         city_name = "Gunma"
         city = "群馬"
-    elif "山梨" in arg:
+    elif "山梨" in "select-menu":
         city_name = "Yamanashi"
         city = "山梨"
-    elif "神奈川" in arg:
+    elif "神奈川" in "select-menu":
         city_name = "Kanagawa"
         city = "神奈川"
-    elif "栃木" in arg:
+    elif "栃木" in "select-menu":
         city_name = "Tochigi"
         city = "栃木"
     else:
         city_name ="Tokyo"
         city = "東京"
+
+
 
     # city_nameで指定した地域のお天気結果取得
     res_api = get_api_response(city_name)
@@ -86,7 +168,7 @@ def reply_weather(message, arg):
     else:
         res_mark = f"設定辞書に{res_mark}が含まれてないみたいだよ"
     
-    if "天気" in arg:
+    if "天気" in message:
         message.reply(f"\nこんにちは！晴男です！！！\n{date_time} 現在の{city}は{res_mark}！！！\n気温は{res_temp}度です！！！") 
 
 
