@@ -16,7 +16,7 @@ import re
 import datetime
 
 client = WebClient(token=os.getenv('SLACK_CLIENT_TOKEN'))
-API_KEY = 
+API_KEY = os.environ["API_KEY"]
 
 
 @listen_to('^天気')
